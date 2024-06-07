@@ -78,9 +78,3 @@ for link in all_links:
     client.upload_items(item)
 
 print(f"Saved {len(all_links)} links to Azure Cosmos DB")
-
-
-# Next steps:
-# Upload to commom repo
-# unify db client and upload func for each step.
-# Figure out a way to use local env vars.
