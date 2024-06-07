@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 from bs4 import BeautifulSoup
 from datetime import datetime
+from cosmos_db import CosmosDBClient
 import hashlib, os, time, requests
 
 load_dotenv()
