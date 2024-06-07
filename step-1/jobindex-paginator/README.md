@@ -2,6 +2,28 @@
 
 This script scrapes job listings from a jobindex and saves the links to Azure Cosmos DB.
 
+## Getting Started
+
+Follow these steps to get the project started:
+
+1. Create a Python virtual environment:
+
+```bash
+python3 -m venv venv
+```
+
+2. Activate the virtual environment:
+
+```bash
+source venv/bin/activate
+```
+
+3. Install the required Python packages:
+
+```bash
+pip install -r requirements.txt
+```
+
 ## Environment Variables
 
 The script uses environment variables for configuration. You can set these variables in a `.env` file in the same directory as the script. Here's an example:
