@@ -5,8 +5,6 @@ from common import CosmosDBClient
 from tenacity import retry, stop_after_attempt, wait_fixed
 import requests
 from bs4 import BeautifulSoup
-import sys
-import json
 
 
 load_dotenv()
