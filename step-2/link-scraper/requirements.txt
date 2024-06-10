@@ -1,0 +1,15 @@
+azure-core==1.30.2
+azure-cosmos==4.7.0
+beautifulsoup4==4.12.3
+certifi==2024.6.2
+charset-normalizer==3.3.2
+common @ git+https://github.com/it-minds/itm_leads-finder-scripts.git@5f1a5dc9b13798a140a1216dd99914cc3836fc83#subdirectory=common
+idna==3.7
+python-dotenv==1.0.1
+requests==2.32.3
+six==1.16.0
+soupsieve==2.5
+tenacity==8.3.0
+typing_extensions==4.12.1
+urllib3==2.2.1
+
