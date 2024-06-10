@@ -34,7 +34,18 @@ class CosmosDBClient:
             for item in self.container.query_items(query=query, enable_cross_partition_query=True):
                 items.append(item)
         except exceptions.CosmosHttpResponseError as e:
-            print(f"An error occured: {e.message}")
+            logging.info(f"An error occured: {e.message}")
+        return items 
+    
+    def fetch_items_step_3(self):
+        query = "SELECT * FROM c WHERE c.step = 2" # Selects all entries that are only on "step 2"
+        items = []
+        
+        try:
+            for item in self.container.query_items(query=query, enable_cross_partition_query=True):
+                items.append(item)
+        except exceptions.CosmosHttpResponseError as e:
+            logging.info(f"An error occured: {e.message}")
         return items 
     
     
