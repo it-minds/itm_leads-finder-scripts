@@ -15,7 +15,7 @@ class JobPostingModel(BaseModel):
     )
     experience: Optional[str] = Field(description="Experience required for the job")
     required_qualifications: List[str] = Field(
-        description="List of required qualifications for the job, if none is found, leave it as an empty list"
+        description="List of required qualifications for the job, if there are no requried qualifications found, leave it as an empty list"
     )
     location: Optional[str] = Field(description="Job location")
     job_type: Optional[str] = Field(description="Job type. Is the job parttime or fulltime, if nothing suggests otherwise, use 'fulltime' ")

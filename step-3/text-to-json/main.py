@@ -3,6 +3,7 @@ from common import prompt_llama3_to_json, CosmosDBClient
 from dotenv import load_dotenv
 import os
 from json_model import JobPostingModel
+from quality_control import json_model_quality_control
 
 load_dotenv()
 
@@ -26,10 +27,8 @@ prompt = """Your task is to analyze the job posting from the user message. Extra
 in accordance with the provided output schema and constraints. If any of these fields cannot be determined, their values should be set to null."""
 
 # Fetching all items from db which have completed step 2
-items_test = client.fetch_items_step_3()
-items = items_test[:10]
-for obj in items:
-    print(obj['id'])
+items = client.fetch_items_step_3()
+
 
 for item in items:
     response = prompt_llama3_to_json(prompt, item["text"], JobPostingModel)
@@ -38,6 +37,14 @@ for item in items:
     if isinstance(response, str):
         print(f"Error in parsing text to json, entry id = {item['id']} - {str(response)}")
         continue
+    
+    #Different quality controls
+    if(json_model_quality_control(response)):
+        item['step_3_quality_control'] = "failed"
+        item['step_3_quality_control_timestamp'] = datetime.now().isoformat()
+        client.update_item(item['id'], item)
+        continue
+
     
     item["step"] = 3
     item["step_3_timestamp"] = datetime.now().isoformat()
