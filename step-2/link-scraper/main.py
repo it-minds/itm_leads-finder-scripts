@@ -5,6 +5,8 @@ from common import CosmosDBClient
 from tenacity import retry, stop_after_attempt, wait_fixed
 import requests
 from bs4 import BeautifulSoup
+import sys
+import json
 
 
 load_dotenv()
@@ -29,13 +31,17 @@ def get_html_document(url):
     response.raise_for_status()  # Raise HTTPError for bad response status codes
     return response.text
 
-links = client.fetch_all_step_2()
+# Fetches all entries in db which are ready for step 2 (Marked as step = 1 in DB)
+links = client.fetch_items_step_2()
 
+
+# Loops through each link and retrieves the text content of the html pages, finally updates the entry in DB with text content and updated step
 for link in links:
     try:
         html_document = get_html_document(link["link"])
     except Exception as e:
-        print(f"failed to get html doc - {e}")
+        print(f"failed to get html doc - {e} - for entry with id: {link['id']}")
+        continue
     # Create soup object
     try:
         soup = BeautifulSoup(html_document, 'html.parser') 
@@ -43,10 +49,17 @@ for link in links:
         print("failed to get soup object",e)
         
     html_text_content = soup.get_text("-", True).replace("\n", "")
+    # Update link object with new information
     link["text"] = html_text_content
     link["step"] = 2
-    
     link["step_2_timestamp"] = datetime.now().isoformat()
+
+    resp = client.update_item(link["id"], link)
+    if(resp == None): print(link['id'])
+
+print(f"Updated {len(links)} items in the DB")
+
+
 
 
 

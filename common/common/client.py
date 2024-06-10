@@ -51,6 +51,6 @@ class CosmosDBClient:
             response = self.container.replace_item(item=item, body=item)
             return response
         except exceptions.CosmosHttpResponseError as e:
-            print(f"An error occurred: {e.message}")
+            print(f"An error occurred: {e.message} - id: {item_id}")
             return None
         
