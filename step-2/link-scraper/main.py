@@ -53,7 +53,7 @@ for link in links:
     link["step_2_timestamp"] = datetime.now().isoformat()
 
     resp = client.update_item(link["id"], link)
-    if(resp == None): print(link['id'])
+    if(resp == None): print(f"failed to update item - id: {link['id']}")
 
 print(f"Updated {len(links)} items in the DB")
 
