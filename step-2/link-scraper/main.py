@@ -39,7 +39,6 @@ for link in links:
         html_document = get_html_document(link["link"])
     except Exception as e:
         print(f"failed to get html doc - {e} - for entry with id: {link['id']}")
-        
         continue
     # Create soup object
     try:

@@ -38,6 +38,9 @@ for item in items:
         print(f"Error in parsing text to json, entry id = {item['id']} - {str(response)}")
         continue
     
+    item["step"] = 3
+    item["step_3_timestamp"] = datetime.now().isoformat()
+    
     #Different quality controls
     failure_reason = json_model_quality_control(response, item['id'])
     if isinstance(failure_reason, str):
@@ -47,12 +50,9 @@ for item in items:
             "failure_reason" : failure_reason
         }
         item["quality_control"] = quality_control
-        client.update_item(item['id'], item)
-        continue
 
     
-    item["step"] = 3
-    item["step_3_timestamp"] = datetime.now().isoformat()
+
     
     #create new object for data from the llm
     llm_populated_data = {
