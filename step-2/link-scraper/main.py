@@ -23,7 +23,7 @@ client = CosmosDBClient(
 )
 
 #Using the requests package to extract entire HTML page from a link, wrapped in retry logic if a 400 status happens
-@retry(stop=stop_after_attempt(5), wait=wait_fixed(5), reraise=True)
+@retry(stop=stop_after_attempt(2), wait=wait_fixed(5), reraise=True)
 def get_html_document(url):
     response = requests.get(url)
     response.raise_for_status()  # Raise HTTPError for bad response status codes
@@ -39,6 +39,7 @@ for link in links:
         html_document = get_html_document(link["link"])
     except Exception as e:
         print(f"failed to get html doc - {e} - for entry with id: {link['id']}")
+        
         continue
     # Create soup object
     try:
@@ -47,6 +48,13 @@ for link in links:
         print("failed to get soup object",e)
         
     html_text_content = soup.get_text("-", True).replace("\n", "")
+    
+    if(len(html_text_content) < 300):
+        link['step_2_quality_control'] = "failed"
+        link['step_2_quality_control_timestamp'] = datetime.now().isoformat()
+        resp = client.update_item(link["id"], link)
+        continue
+    
     # Update link object with new information
     link["text"] = html_text_content
     link["step"] = 2

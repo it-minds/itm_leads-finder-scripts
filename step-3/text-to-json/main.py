@@ -39,7 +39,7 @@ for item in items:
         continue
     
     #Different quality controls
-    if(json_model_quality_control(response)):
+    if(json_model_quality_control(response, item['id'])):
         item['step_3_quality_control'] = "failed"
         item['step_3_quality_control_timestamp'] = datetime.now().isoformat()
         client.update_item(item['id'], item)
