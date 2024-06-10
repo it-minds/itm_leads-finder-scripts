@@ -50,8 +50,12 @@ for link in links:
     html_text_content = soup.get_text("-", True).replace("\n", "")
     
     if(len(html_text_content) < 300):
-        link['step_2_quality_control'] = "failed"
-        link['step_2_quality_control_timestamp'] = datetime.now().isoformat()
+        quality_control = {
+            "step" : 2,
+            "timestamp" : datetime.now().isoformat(),
+            "failure_reason" : "text too short"
+        }
+        link['quality_control'] = quality_control
         resp = client.update_item(link["id"], link)
         continue
     

@@ -39,9 +39,14 @@ for item in items:
         continue
     
     #Different quality controls
-    if(json_model_quality_control(response, item['id'])):
-        item['step_3_quality_control'] = "failed"
-        item['step_3_quality_control_timestamp'] = datetime.now().isoformat()
+    failure_reason = json_model_quality_control(response, item['id'])
+    if isinstance(failure_reason, str):
+        quality_control = {
+            "step" : 3,
+            "timestamp" : datetime.now().isoformat(),
+            "failure_reason" : failure_reason
+        }
+        item["quality_control"] = quality_control
         client.update_item(item['id'], item)
         continue
 
