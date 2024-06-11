@@ -44,12 +44,12 @@ for item in items:
     #Different quality controls
     failure_reason = json_model_quality_control(response, item['id'])
     if isinstance(failure_reason, str):
-        quality_control = {
+        error_obj = {
             "step" : 3,
             "timestamp" : datetime.now().isoformat(),
             "failure_reason" : failure_reason
         }
-        item["quality_control"] = quality_control
+        item["error"] = error_obj
 
     
 
