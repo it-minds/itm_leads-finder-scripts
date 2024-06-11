@@ -5,6 +5,7 @@ from common import CosmosDBClient
 from tenacity import retry, stop_after_attempt, wait_fixed
 import requests
 from bs4 import BeautifulSoup
+from quality_control import html_text_quality_control
 
 
 load_dotenv()
@@ -23,11 +24,28 @@ client = CosmosDBClient(
 )
 
 #Using the requests package to extract entire HTML page from a link, wrapped in retry logic if a 400 status happens
-@retry(stop=stop_after_attempt(5), wait=wait_fixed(5), reraise=True)
+@retry(stop=stop_after_attempt(2), wait=wait_fixed(5), reraise=True)
 def get_html_document(url):
     response = requests.get(url)
     response.raise_for_status()  # Raise HTTPError for bad response status codes
     return response.text
+
+
+def get_html_text_content(link):
+    
+    try:
+        html_document = get_html_document(link["link"])
+    except Exception as e:
+        print(f"failed to get html doc - {e} - for entry with id: {link['id']}")
+        return None
+    try:
+        # Create soup object
+        soup = BeautifulSoup(html_document, 'html.parser') 
+    except Exception as e:
+        print("failed to get soup object",e)
+        return None
+    
+    return soup.get_text("-", True).replace("\n", "")
 
 # Fetches all entries in db which are ready for step 2 (Marked as step = 1 in DB)
 links = client.fetch_items_step_2()
@@ -35,25 +53,27 @@ links = client.fetch_items_step_2()
 
 # Loops through each link and retrieves the text content of the html pages, finally updates the entry in DB with text content and updated step
 for link in links:
-    try:
-        html_document = get_html_document(link["link"])
-    except Exception as e:
-        print(f"failed to get html doc - {e} - for entry with id: {link['id']}")
-        continue
-    # Create soup object
-    try:
-        soup = BeautifulSoup(html_document, 'html.parser') 
-    except Exception as e:
-        print("failed to get soup object",e)
-        
-    html_text_content = soup.get_text("-", True).replace("\n", "")
+
+    html_text_content = get_html_text_content(link)
+    
+    failure_reason = html_text_quality_control(html_text_content)
+    
+    if failure_reason:
+        error_obj = {
+            "step" : 2,
+            "timestamp" : datetime.now().isoformat(),
+            "failure_reason" : failure_reason
+        }
+        link["error"] = error_obj
+
+    
     # Update link object with new information
-    link["text"] = html_text_content
+    link["text"] = "" if html_text_content is None else html_text_content
     link["step"] = 2
     link["step_2_timestamp"] = datetime.now().isoformat()
 
     resp = client.update_item(link["id"], link)
-    if(resp == None): print(link['id'])
+    if(resp == None): print(f"failed to update item - id: {link['id']}")
 
 print(f"Updated {len(links)} items in the DB")
 

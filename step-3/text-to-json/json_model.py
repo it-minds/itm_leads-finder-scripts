@@ -15,15 +15,15 @@ class JobPostingModel(BaseModel):
     )
     experience: Optional[str] = Field(description="Experience required for the job")
     required_qualifications: List[str] = Field(
-        description="List of required qualifications for the job, if none is found, leave it as an empty list"
+        description="List of required qualifications for the job, if there are no requried qualifications found, leave it as an empty list"
     )
     location: Optional[str] = Field(description="Job location")
-    work_hours: Optional[str] = Field(description="Work hours")
+    job_type: Optional[str] = Field(description="Job type. Is the job parttime or fulltime, if nothing suggests otherwise, use 'fulltime' ")
     industry: Optional[str] = Field(description="Industry of the company")
-    application_deadline: Optional[datetime] = Field(
+    application_deadline: Optional[str] = Field(
         description="Application deadline in UTC-0 and ISO 8601 format"
     )
-    posting_time: Optional[datetime] = Field(
+    posting_time: Optional[str] = Field(
         description="Job posting time in UTC-0 and ISO 8601 format"
     )
     website_source: Optional[str] = Field(
