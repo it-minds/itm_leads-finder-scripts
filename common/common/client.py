@@ -38,7 +38,7 @@ class CosmosDBClient:
         return items 
     
     def fetch_items_step_3(self):
-        query = "SELECT * FROM c WHERE c.step = 2" # Selects all entries that are only on "step 2"
+        query = "SELECT * FROM c WHERE NOT IS_DEFINED(c.quality_control) AND c.step = 2" # Selects all entries that are only on "step 2" and no errors are present
         items = []
         
         try:
