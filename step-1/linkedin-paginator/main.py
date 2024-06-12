@@ -57,7 +57,7 @@ while START < 999:
     
     links = []
     
-    # Find link and date posten and append to object
+    # Find link and date posted and append to object
     for li in soup.find_all("li"):
         a_tag = li.find("a", class_="base-card__full-link", href=True)
         time_tag = li.find("time", class_="job-search-card__listdate--new", datetime=True)
@@ -65,7 +65,7 @@ while START < 999:
         if a_tag and time_tag:
             links.append({
                 "link": clean_url(a_tag["href"]),
-                "timeago": time_tag["datetime"]
+                "timeago": datetime.strptime(time_tag["datetime"], "%Y-%m-%d").isoformat()
             })
 
     

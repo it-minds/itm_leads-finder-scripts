@@ -46,7 +46,17 @@ while page_number < last_page:
     response = requests.get(url)
     soup = BeautifulSoup(response.text, "html.parser")
 
-    links = [a["href"] for a in soup.find_all("a", class_="seejobdesktop", href=True)]
+    #links = [a["href"] for a in soup.find_all("a", class_="seejobdesktop", href=True)]
+    links = []
+    for div in soup.find_all("div", class_="PaidJob"):
+        a_tag = div.find("a", class_="seejobdesktop", href=True)
+        time_tag = div.find("time", datetime=True)
+
+        if a_tag and time_tag:
+            links.append({
+                "link": a_tag["href"],
+                "timeago": datetime.strptime(time_tag["datetime"], "%Y-%m-%d").isoformat()
+            })
 
     # Retry the current page if no links are found
     if not links:
@@ -66,19 +76,20 @@ while page_number < last_page:
 
     page_number += 1  # Increment the page number
 
-
+print(links)
 # Save links to Azure Cosmos DB
-for link in all_links:
-    hashed_link = hashlib.sha1(link.encode("utf-8")).hexdigest()
-    item = {
-        "id": hashed_link,
-        "step_1_timestamp": datetime.now().isoformat(),
-        "step": 1,
-        "link": link,
-        "source": "jobindex",
-    }
-    cosmos_response: exceptions.CosmosHttpResponseError | None = client.upload_items(item)
-    if isinstance(cosmos_response, exceptions.CosmosHttpResponseError):
-        error_count += 1
+# for link in all_links:
+#     hashed_link = hashlib.sha1(link["link"].encode("utf-8")).hexdigest()
+#     item = {
+#         "id": hashed_link,
+#         "step_1_timestamp": datetime.now().isoformat(),
+#         "step": 1,
+#         "link": link["link"],
+#         "time_posted": time_tag["datetime"],
+#         "source": "jobindex",
+#     }
+#     cosmos_response: exceptions.CosmosHttpResponseError = client.upload_items(item)
+#     if isinstance(cosmos_response, exceptions.CosmosHttpResponseError):
+#         error_count += 1
 
 print(f"Saved {len(all_links) - error_count} links to Azure Cosmos DB, with {error_count} errors happening out of a total of {len(all_links)} - See cosmosDB Insights for more info")
