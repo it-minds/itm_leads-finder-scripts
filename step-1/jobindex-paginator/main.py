@@ -78,18 +78,18 @@ while page_number < last_page:
 
 print(links)
 # Save links to Azure Cosmos DB
-# for link in all_links:
-#     hashed_link = hashlib.sha1(link["link"].encode("utf-8")).hexdigest()
-#     item = {
-#         "id": hashed_link,
-#         "step_1_timestamp": datetime.now().isoformat(),
-#         "step": 1,
-#         "link": link["link"],
-#         "time_posted": time_tag["datetime"],
-#         "source": "jobindex",
-#     }
-#     cosmos_response: exceptions.CosmosHttpResponseError = client.upload_items(item)
-#     if isinstance(cosmos_response, exceptions.CosmosHttpResponseError):
-#         error_count += 1
+for link in all_links:
+    hashed_link = hashlib.sha1(link["link"].encode("utf-8")).hexdigest()
+    item = {
+        "id": hashed_link,
+        "step_1_timestamp": datetime.now().isoformat(),
+        "step": 1,
+        "link": link["link"],
+        "time_posted": time_tag["datetime"],
+        "source": "jobindex",
+    }
+    cosmos_response: exceptions.CosmosHttpResponseError = client.upload_items(item)
+    if isinstance(cosmos_response, exceptions.CosmosHttpResponseError):
+        error_count += 1
 
 print(f"Saved {len(all_links) - error_count} links to Azure Cosmos DB, with {error_count} errors happening out of a total of {len(all_links)} - See cosmosDB Insights for more info")
