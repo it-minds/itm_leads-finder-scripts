@@ -1,8 +1,8 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="common",
-    version="0.3",
+    name="common-package",
+    version="0.4",
     packages=find_packages(),
     install_requires=[
         "aiohttp",
