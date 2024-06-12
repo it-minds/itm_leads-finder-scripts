@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from common import CosmosDBClient
 import hashlib, os, time, requests
+from azure.cosmos import exceptions
 
 load_dotenv()
 
@@ -76,8 +77,8 @@ for link in all_links:
         "link": link,
         "source": "jobindex",
     }
-    cosmos_response = client.upload_items(item)
-    if not cosmos_response == None:
+    cosmos_response: exceptions.CosmosHttpResponseError | None = client.upload_items(item)
+    if isinstance(cosmos_response, exceptions.CosmosHttpResponseError):
         error_count += 1
 
-print(f"Saved {len(all_links) - error_count} links to Azure Cosmos DB, with {error_count} errors happening")
+print(f"Saved {len(all_links) - error_count} links to Azure Cosmos DB, with {error_count} errors happening out of a total of {len(all_links)} - See cosmosDB Insights for more info")
