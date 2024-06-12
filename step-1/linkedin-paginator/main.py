@@ -36,6 +36,7 @@ client = CosmosDBClient(
 attempts = 0
 all_links = []  # List to store all links
 
+error_count = 0
 #Helper function
 def clean_url(url):
     # Parse the URL into its components
@@ -100,8 +101,10 @@ for link in all_links:
         "time_posted": time_tag["datetime"],
         "source": "linkedin",
     }
-    client.upload_items(item)
+    cosmos_response = client.upload_items(item)
+    if not cosmos_response == None:
+        error_count += 1
     
 
-print(f"Saved {len(all_links)} links to Azure Cosmos DB")
+print(f"Saved {len(all_links) - error_count} links to Azure Cosmos DB, with {error_count} errors happening")
 

@@ -22,9 +22,11 @@ client = CosmosDBClient(
     COSMOS_DB_DATABASE_NAME,
     COSMOS_DB_CONTAINER_NAME,
 )
+error_count = 0
+success_count = 0
 
 #Using the requests package to extract entire HTML page from a link, wrapped in retry logic if a 400 status happens
-@retry(stop=stop_after_attempt(2), wait=wait_fixed(5), reraise=True)
+@retry(stop=stop_after_attempt(3), wait=wait_fixed(5), reraise=True)
 def get_html_document(url):
     response = requests.get(url)
     response.raise_for_status()  # Raise HTTPError for bad response status codes
@@ -73,9 +75,15 @@ for link in links:
     link["step_2_timestamp"] = datetime.now().isoformat()
 
     resp = client.update_item(link["id"], link)
-    if(resp == None): print(f"failed to update item - id: {link['id']}")
+    if resp == None: 
+        print(f"failed to update item - id: {link['id']}")
+        
+    if "error" in link:
+        error_count += 1
+    else:
+        success_count += 1
 
-print(f"Updated {len(links)} items in the DB")
+print(f"Updated {success_count} items sucessfully in the DB - {error_count} failed - out of a total of {len(links)}")
 
 
 

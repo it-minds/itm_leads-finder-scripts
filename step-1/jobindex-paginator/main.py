@@ -36,6 +36,7 @@ page_number = START_PAGE
 last_page = MAX_PAGES + START_PAGE
 attempts = 0
 all_links = []  # List to store all links
+error_count = 0
 
 while page_number < last_page:
     print(f"Processing page {page_number}...")
@@ -75,6 +76,8 @@ for link in all_links:
         "link": link,
         "source": "jobindex",
     }
-    client.upload_items(item)
+    cosmos_response = client.upload_items(item)
+    if not cosmos_response == None:
+        error_count += 1
 
-print(f"Saved {len(all_links)} links to Azure Cosmos DB")
+print(f"Saved {len(all_links) - error_count} links to Azure Cosmos DB, with {error_count} errors happening")

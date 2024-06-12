@@ -21,10 +21,12 @@ class CosmosDBClient:
     def upload_items(self, item):
         try:
             self.container.create_item(body=item)
+            return None
         except exceptions.CosmosHttpResponseError as e:
             logging.info(
                 f"An error occurred while creating item with id {item['id']}: {str(e)}"
             )
+            return e
             
     def fetch_items_step_2(self):
         query = "SELECT * FROM c WHERE c.step = 1" # Selects all entries that are only on "step 1"

@@ -31,7 +31,8 @@ in accordance with the provided output schema and constraints. If any of these f
 
 # Fetching all items from db which have completed step 2
 items = client.fetch_items_step_3()
-
+error_count = 0
+success_count = 0
 
 for item in items:
     response = text_to_model.generate_model(item["text"])
@@ -46,6 +47,7 @@ for item in items:
         }
         item["error"] = error_obj
         client.update_item(item["id"], item)
+        error_count +=1
         continue
     
     item["step"] = 3
@@ -85,9 +87,15 @@ for item in items:
     # Merge llm_populated_data with item
     llm_populated_data = {**item, **llm_populated_data}
     
-    try:
-        client.update_item(llm_populated_data["id"], llm_populated_data)
-    except Exception as e:
-        print(f"failed to update item : {llm_populated_data['id']} - error : {e}")
+    
+    resp = client.update_item(llm_populated_data["id"], llm_populated_data)
+    if resp == None:
+        print(f"failed to update item : {llm_populated_data['id']}")
         
-print(f"Updated {len(items)} items in the DB")
+    if "error" in llm_populated_data:
+        error_count += 1
+    else:
+        success_count += 1
+
+        
+print(f"Updated {success_count} items sucessfully in the DB - {error_count} failed - out of a total of {len(items)}")
