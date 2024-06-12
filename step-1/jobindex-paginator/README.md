@@ -14,8 +14,13 @@ python3 -m venv venv
 
 2. Activate the virtual environment:
 
+For MacOS
 ```bash
 source venv/bin/activate
+```
+For Windows
+```bash
+.\venv\Scripts\activate
 ```
 
 3. Install the required Python packages:

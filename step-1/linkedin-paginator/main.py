@@ -1,5 +1,5 @@
 import hashlib
-import json
+from azure.cosmos import exceptions
 import time
 from urllib.parse import urlparse, urlunparse
 from common import CosmosDBClient
@@ -102,9 +102,9 @@ for link in all_links:
         "source": "linkedin",
     }
     cosmos_response = client.upload_items(item)
-    if not cosmos_response == None:
+    if isinstance(cosmos_response, exceptions.CosmosHttpResponseError):
         error_count += 1
     
 
-print(f"Saved {len(all_links) - error_count} links to Azure Cosmos DB, with {error_count} errors happening")
+print(f"Saved {len(all_links) - error_count} links to Azure Cosmos DB, with {error_count} errors happening out of a total of {len(all_links)} - See cosmosDB Insights for more info")
 
