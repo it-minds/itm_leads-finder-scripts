@@ -76,7 +76,6 @@ while page_number < last_page:
 
     page_number += 1  # Increment the page number
 
-print(links)
 # Save links to Azure Cosmos DB
 for link in all_links:
     hashed_link = hashlib.sha1(link["link"].encode("utf-8")).hexdigest()
