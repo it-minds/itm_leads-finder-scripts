@@ -1,7 +1,7 @@
 azure-core==1.30.2
 azure-cosmos==4.7.0
 beautifulsoup4==4.12.3
-common @ git+https://github.com/it-minds/itm_leads-finder-scripts.git@main#subdirectory=common
+common @ git+https://github.com/it-minds/itm_leads-finder-scripts.git@main#subdirectory=internal
 python-dotenv==1.0.1
 requests==2.32.3
 six==1.16.0
