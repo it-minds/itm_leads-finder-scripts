@@ -2,7 +2,6 @@ from langchain_core.pydantic_v1 import BaseModel
 from langchain_groq import ChatGroq
 import os
 from typing import TypeVar, Type, Union, Generic
-import traceback
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -53,5 +52,5 @@ class TextToModel(Generic[T]):
 
             return generated_model
         except Exception as e:
-            error_info = f"Exception type: {type(e).__name__}, Message: {str(e)}, Traceback: {traceback.format_exc()}"
+            error_info = f"Exception type: {type(e).__name__}, Message: {str(e)}"
             return error_info

@@ -1,5 +1,5 @@
 from datetime import datetime
-from common.package import prompt_llama3_to_json, CosmosDBClient
+from common import TextToModel, CosmosDBClient
 from dotenv import load_dotenv
 import os
 from json_model import JobPostingModel
@@ -22,6 +22,8 @@ client = CosmosDBClient(
     COSMOS_DB_CONTAINER_NAME,
 )
 
+text_to_model = TextToModel(JobPostingModel)
+
 
 # This is the general prompt we use for extracting specific infomation about the job
 prompt = """Your task is to analyze the job posting from the user message. Extract the necessary fields 
@@ -32,11 +34,18 @@ items = client.fetch_items_step_3()
 
 
 for item in items:
-    response = prompt_llama3_to_json(prompt, item["text"], JobPostingModel)
+    response = text_to_model.generate_model(item["text"])
     
     #Error handling for prompt_llama3_to_json
     if isinstance(response, str):
         print(f"Error in parsing text to json, entry id = {item['id']} - {str(response)}")
+        error_obj = {
+            "step" : 3,
+            "timestamp" : datetime.now().isoformat(),
+            "failure_reason" : response
+        }
+        item["error"] = error_obj
+        client.update_item(item["id"], item)
         continue
     
     item["step"] = 3
