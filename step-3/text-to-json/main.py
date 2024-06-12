@@ -1,9 +1,10 @@
 from datetime import datetime
-from common import prompt_llama3_to_json, CosmosDBClient
+from common.package import prompt_llama3_to_json, CosmosDBClient
 from dotenv import load_dotenv
 import os
 from json_model import JobPostingModel
 from quality_control import json_model_quality_control
+import importlib
 
 load_dotenv()
 
