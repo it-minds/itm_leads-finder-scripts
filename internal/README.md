@@ -13,7 +13,7 @@ Follow these steps:
 2. Install the package using `pip`. Replace `your_pat` with your Personal Access Token.
 
 ```bash
-pip install git+https://it-minds:your_pat@github.com/it-minds/itm_leads-finder-scripts.git@main#egg=common\&subdirectory=common
+pip install git+https://it-minds:your_pat@github.com/it-minds/itm_leads-finder-scripts.git@main#egg=common\&subdirectory=internal
 ```
 
 ## Usage
