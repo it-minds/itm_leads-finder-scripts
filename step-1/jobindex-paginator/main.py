@@ -84,7 +84,7 @@ for link in all_links:
         "step_1_timestamp": datetime.now().isoformat(),
         "step": 1,
         "link": link["link"],
-        "time_posted": time_tag["datetime"],
+        "time_posted": link["timeago"],
         "source": "jobindex",
     }
     cosmos_response: exceptions.CosmosHttpResponseError = client.upload_items(item)
