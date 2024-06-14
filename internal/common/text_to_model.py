@@ -2,6 +2,8 @@ from langchain_core.pydantic_v1 import BaseModel
 from langchain_groq import ChatGroq
 import os
 from typing import TypeVar, Type, Union, Generic
+from langchain_core.output_parsers import JsonOutputParser
+from langchain_core.messages import HumanMessage, SystemMessage
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -30,7 +32,9 @@ class TextToModel(Generic[T]):
         self.pydantic_model = pydantic_model
         self.model_name = os.getenv("GROQ_MODEL", "llama3-70b-8192")
         llm = ChatGroq(temperature=0, model_name=self.model_name)
-        self.structured_output_llm = llm.with_structured_output(pydantic_model)
+        self.structured_output_llm = llm.with_structured_output(
+            pydantic_model, method="json_mode"
+        )
 
     def generate_model(self, input_text: str) -> Union[T, str]:
         """
@@ -43,7 +47,16 @@ class TextToModel(Generic[T]):
             Union[T, str]: The generated model if successful, otherwise an error message.
         """
         try:
-            generated_model = self.structured_output_llm.invoke(input_text)
+
+            parser = JsonOutputParser(pydantic_object=self.pydantic_model)
+            input = [
+                SystemMessage(
+                    content=parser.get_format_instructions()
+                    + "\nDo not include any preamble or explanation in the response."
+                ),
+                HumanMessage(content=input_text),
+            ]
+            generated_model = self.structured_output_llm.invoke(input)
 
             if not isinstance(generated_model, self.pydantic_model):
                 raise TypeError(
