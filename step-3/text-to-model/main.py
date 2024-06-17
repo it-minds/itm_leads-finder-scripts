@@ -3,8 +3,7 @@ from common import TextToModel, CosmosDBClient
 from dotenv import load_dotenv
 import os
 from json_model import JobPostingModel
-from quality_control import json_model_quality_control
-import importlib
+from quality_control import check_quality
 
 load_dotenv()
 
@@ -24,17 +23,17 @@ client = CosmosDBClient(
 
 text_to_model = TextToModel(JobPostingModel)
 
-
-# This is the general prompt we use for extracting specific infomation about the job
-prompt = """Your task is to analyze the job posting from the user message. Extract the necessary fields 
-in accordance with the provided output schema and constraints. If any of these fields cannot be determined, their values should be set to null."""
+# Selects all entries that are only on "step 2" and no errors are present
+query = "SELECT * FROM c WHERE NOT IS_DEFINED(c.error) AND c.step = 2"
 
 # Fetching all items from db which have completed step 2
-items = client.fetch_items_step_3()
+items = client.fetch_items_by_query(query)
+
 error_count = 0
 success_count = 0
 
-for item in items:
+starttime = datetime.now()
+for (i,item) in enumerate(items):
     response = text_to_model.generate_model(item["text"])
     
     #Error handling for prompt_llama3_to_json
@@ -54,12 +53,12 @@ for item in items:
     item["step_3_timestamp"] = datetime.now().isoformat()
     
     #Different quality controls
-    failure_reason = json_model_quality_control(response, item['id'])
-    if isinstance(failure_reason, str):
+    failure_reason = check_quality(response)
+    if failure_reason["marked"]:
         error_obj = {
             "step" : 3,
             "timestamp" : datetime.now().isoformat(),
-            "failure_reason" : failure_reason
+            "failure_reason" : failure_reason["reasons"]
         }
         item["error"] = error_obj
 
@@ -77,8 +76,9 @@ for item in items:
         "technologies": response.technologies,
         "experience": response.experience,
         "required_qualifications": response.required_qualifications,
+        "education": response.education,
         "location": response.location,
-        "job_type": response.job_type,
+        "fulltime": response.fulltime,
         "industry": response.industry,
         "application_deadline": response.application_deadline,
         "posting_time": response.posting_time,
@@ -96,6 +96,9 @@ for item in items:
         error_count += 1
     else:
         success_count += 1
-
+        
+    if len(items) >= 10 and i % (len(items) // 10) == 0:
+        print(f"Completed {(i / len(items) * 100)+ 10:.0f}% - with {error_count} errors, and {success_count} successes")
+        print(datetime.now() - starttime)   
         
 print(f"Updated {success_count} items sucessfully in the DB - {error_count} failed - out of a total of {len(items)}")

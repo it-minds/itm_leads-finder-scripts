@@ -49,8 +49,12 @@ def get_html_text_content(link):
     
     return soup.get_text("-", True).replace("\n", "")
 
+
+# Selects all entries that are only on "step 1"
+query = "SELECT * FROM c WHERE c.step = 1" 
+
 # Fetches all entries in db which are ready for step 2 (Marked as step = 1 in DB)
-links = client.fetch_items_step_2()
+links = client.fetch_items_by_query(query)
 
 
 # Loops through each link and retrieves the text content of the html pages, finally updates the entry in DB with text content and updated step

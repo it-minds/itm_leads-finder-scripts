@@ -26,21 +26,9 @@ class CosmosDBClient:
             logging.info(
                 f"An error occurred while creating item with id {item['id']}: {str(e)}"
             )
-            return e
-            
-    def fetch_items_step_2(self):
-        query = "SELECT * FROM c WHERE c.step = 1" # Selects all entries that are only on "step 1"
-        items = []
-        
-        try:
-            for item in self.container.query_items(query=query, enable_cross_partition_query=True):
-                items.append(item)
-        except exceptions.CosmosHttpResponseError as e:
-            logging.info(f"An error occured: {e.message}")
-        return items 
+            return e 
     
-    def fetch_items_step_3(self):
-        query = "SELECT * FROM c WHERE NOT IS_DEFINED(c.error) AND c.step = 2" # Selects all entries that are only on "step 2" and no errors are present
+    def fetch_items_by_query(self,query: str):
         items = []
         
         try:

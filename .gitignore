@@ -5,3 +5,6 @@
 
 # hoaj specific ignores: 
 internal/main.py
+
+# AndreasHolmAndersen specific ignores:
+internal/common/test

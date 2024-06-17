@@ -4,28 +4,52 @@ from datetime import datetime
 
 
 class JobPostingModel(BaseModel):
-    position: Optional[str] = Field(description="Job position")
-    company: Optional[str] = Field(description="Company name")
-    job_description: Optional[str] = Field(description="Job description")
-    contact_name: Optional[str] = Field(description="Contact person's name")
-    contact_phone: Optional[str] = Field(description="Contact person's phone number")
-    contact_email: Optional[str] = Field(description="Contact person's email")
+    # """
+    # Represents a job posting, encapsulating all relevant details extracted from user messages or postings. This model is designed to parse and structure 
+    # data from natural language inputs, ensuring that information such as job title, salary range, and qualifications are accurately captured and represented.
+    # """
+    position: Optional[str] = Field(
+        description="The job position/title within the company."
+    )
+    company: Optional[str] = Field(
+        description="The name of the company offering the job."
+    )
+    job_description: Optional[str] = Field( 
+        description="A detailed description of the job responsibilities and role."
+    )
+    contact_name: Optional[str] = Field(
+        description="The name of the contact person responsible for the job listing."
+    )
+    contact_phone: Optional[str] = Field(
+        description="Phone number of the contact person."
+    )
+    contact_email: Optional[str] = Field(
+        description="Email address of the contact person."
+    )
     technologies: List[str] = Field(
-        description="List of technologies required for the job, if there are no technologies leave it as an empty list"
+        description="List of technologies required and/or used for the job. Leave as an empty list if none."
     )
-    experience: Optional[str] = Field(description="Experience required for the job")
+    experience: Optional[str] = Field(
+        description="Experience level (e.g., '3 years of experience') required for the job."
+    )
     required_qualifications: List[str] = Field(
-        description="List of required qualifications for the job, if there are no requried qualifications found, leave it as an empty list"
+        description="List of required qualifications (e.g., skills, certifications) for the job. Leave as an empty list if none."
     )
-    location: Optional[str] = Field(description="Job location")
-    job_type: Optional[str] = Field(description="Job type. Is the job parttime or fulltime, if nothing suggests otherwise, use 'fulltime' ")
-    industry: Optional[str] = Field(description="Industry of the company")
+    education: Optional[str] = Field(
+        description="Level of education required for the job (e.g., 'Bachelor's degree')."
+    )
+    location: Optional[str] = Field(
+        description="Location where the job is based (e.g., city, country)."
+    )
+    fulltime: Optional[bool] = Field(
+        description="Boolean indicating if the job is full-time (True) or part-time (False), if nothing suggests that the job is part-time, it is most likely full-time."
+    )
+    industry: Optional[str] = Field(
+        description="Industry to which the company belongs (e.g., 'Technology', 'Healthcare')."
+    )
     application_deadline: Optional[str] = Field(
-        description="Application deadline in UTC-0 and ISO 8601 format"
+        description="Deadline for submitting applications in UTC-0 and ISO 8601 format (e.g., '2024-12-31T23:59:59Z')."
     )
     posting_time: Optional[str] = Field(
-        description="Job posting time in UTC-0 and ISO 8601 format"
-    )
-    website_source: Optional[str] = Field(
-        description="Website source of the job posting"
+        description="Date and time when the job was posted in UTC-0 and ISO 8601 format (e.g., '2024-06-14T12:00:00Z')."
     )
