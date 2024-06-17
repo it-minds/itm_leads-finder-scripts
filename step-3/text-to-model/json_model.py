@@ -4,17 +4,17 @@ from datetime import datetime
 
 
 class JobPostingModel(BaseModel):
-    """
-    Represents a job posting, encapsulating all relevant details extracted from user messages or postings. This model is designed to parse and structure 
-    data from natural language inputs, ensuring that information such as job title, salary range, and qualifications are accurately captured and represented.
-    """
+    # """
+    # Represents a job posting, encapsulating all relevant details extracted from user messages or postings. This model is designed to parse and structure 
+    # data from natural language inputs, ensuring that information such as job title, salary range, and qualifications are accurately captured and represented.
+    # """
     position: Optional[str] = Field(
         description="The job position/title within the company."
     )
     company: Optional[str] = Field(
         description="The name of the company offering the job."
     )
-    job_description: Optional[str] = Field(
+    job_description: Optional[str] = Field( 
         description="A detailed description of the job responsibilities and role."
     )
     contact_name: Optional[str] = Field(

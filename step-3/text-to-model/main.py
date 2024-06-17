@@ -23,9 +23,12 @@ client = CosmosDBClient(
 
 text_to_model = TextToModel(JobPostingModel)
 
+# Selects all entries that are only on "step 2" and no errors are present
+query = "SELECT * FROM c WHERE NOT IS_DEFINED(c.error) AND c.step = 2"
+
 # Fetching all items from db which have completed step 2
-items__ = client.fetch_items_step_3()
-items = items__[:10]
+items = client.fetch_items_by_query(query)
+
 error_count = 0
 success_count = 0
 
