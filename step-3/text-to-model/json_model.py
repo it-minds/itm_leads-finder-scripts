@@ -27,7 +27,7 @@ class JobPostingModel(BaseModel):
         description="Email address of the contact person."
     )
     technologies: List[str] = Field(
-        description="List of technologies required for the job. Leave as an empty list if none."
+        description="List of technologies required and/or used for the job. Leave as an empty list if none."
     )
     experience: Optional[str] = Field(
         description="Experience level (e.g., '3 years of experience') required for the job."
