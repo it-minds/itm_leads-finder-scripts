@@ -41,15 +41,15 @@ class CosmosDBClient:
     
     def update_item(self, item_id, updated_data):
         try:
-            # Read the item to update
-            item = self.container.read_item(item=item_id, partition_key=item_id)
+            # # Read the item to update
+            # item = self.container.read_item(item=item_id, partition_key=item_id)
             
-            # Update the item with new data
-            for key, value in updated_data.items():
-                item[key] = value
+            # # Update the item with new data
+            # for key, value in updated_data.items():
+            #     item[key] = value
 
             # Replace the item in the container
-            response = self.container.replace_item(item=item, body=item)
+            response = self.container.replace_item(item=updated_data, body=updated_data)
             return response
         except exceptions.CosmosHttpResponseError as e:
             logging.info(f"An error occurred while updating item with id {item_id}: {str(e)} ")
