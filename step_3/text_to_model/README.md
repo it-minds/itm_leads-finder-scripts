@@ -30,18 +30,8 @@ pip install -r requirements.txt
 
 ## Environment Variables
 
-The script uses environment variables for configuration. You can set these variables in a `.env` file in the same directory as the script. 
+The script uses environment variables for configuration. You can set these variables in a `local.settings.json` file in the same directory as the script. (See `example.settings.json`)
 
 For the Groq api key see [GROQ API KEY](https://console.groq.com/keys)
 
 For the Grog model we suggest just using the default of `llama3-70b-8192`
-
-Here's an example:
-```env
-GROQ_MODEL=select-groq-llm-model
-GROQ_API_KEY=your-groq-api-key
-COSMOS_DB_ENDPOINT=your-cosmos-db-endpoint
-COSMOS_DB_PRIMARY_KEY=your-primary-key
-COSMOS_DB_DATABASE_NAME=your-database-name
-COSMOS_DB_CONTAINER_NAME=your-container-name
-```
