@@ -1,4 +1,3 @@
-from dotenv import load_dotenv
 from bs4 import BeautifulSoup
 from datetime import datetime
 from common import CosmosDBClient
@@ -7,18 +6,11 @@ from azure.cosmos import exceptions
 
 def jobindex_paginator():
 
-    load_dotenv()
-
-    # Crawling vars
-    BASE_URL = os.environ["BASE_URL"]
-    MAX_PAGES = int(os.environ["MAX_PAGES"])  # Set the maximum number of pages to scrape
-    START_PAGE = int(os.environ["START_PAGE"])  # Set the starting page on jobindex
-    RETRY_DELAY_SECONDS = int(
-        os.environ["RETRY_DELAY_SECONDS"]
-    )  # Set the delay before retrying a page
-    MAX_ATTEMPTS = int(
-        os.environ["MAX_ATTEMPTS"]
-    )  # Set the maximum number of attempts to scrape the page
+    BASE_URL="https://www.jobindex.dk/jobsoegning/it/systemudvikling/danmark?page="
+    MAX_PAGES=100
+    START_PAGE=1
+    RETRY_DELAY_SECONDS=5
+    MAX_ATTEMPTS=2
 
     # Azure Cosmos DB vars
     COSMOS_DB_ENDPOINT = os.environ["COSMOS_DB_ENDPOINT"]

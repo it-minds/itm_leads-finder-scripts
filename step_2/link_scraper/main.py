@@ -1,4 +1,3 @@
-from dotenv import load_dotenv
 import os
 from datetime import datetime
 from common import CosmosDBClient
@@ -34,7 +33,7 @@ def get_html_text_content(link):
 
 
 def link_scraper():
-    load_dotenv()
+
     # Azure Cosmos DB vars
     COSMOS_DB_ENDPOINT = os.environ["COSMOS_DB_ENDPOINT"]
     COSMOS_DB_PRIMARY_KEY = os.environ["COSMOS_DB_PRIMARY_KEY"]

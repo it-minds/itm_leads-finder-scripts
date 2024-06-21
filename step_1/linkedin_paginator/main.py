@@ -4,13 +4,11 @@ import time
 from urllib.parse import urlparse, urlunparse
 from common import CosmosDBClient
 import os
-from dotenv import load_dotenv
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
 
 def linkedin_paginator():
-    load_dotenv()
 
     # # Url vars
     # Used for accessing the "next page"
