@@ -1,4 +1,4 @@
-from json_model import JobPostingModel
+from .json_model import JobPostingModel
 
 def check_quality(self: JobPostingModel):
     prioritized_properties = ['company', 'position', 'job_description']

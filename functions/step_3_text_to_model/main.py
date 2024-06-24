@@ -1,27 +1,30 @@
 from datetime import datetime
 from common import TextToModel, CosmosDBClient
-import os
-from json_model import JobPostingModel
-from quality_control import check_quality
+import os, logging
+from .json_model import JobPostingModel
+from .quality_control import check_quality
 
 
 
+def get_client() -> CosmosDBClient:
+    # Azure Cosmos DB vars
+    COSMOS_DB_ENDPOINT = os.environ["COSMOS_DB_ENDPOINT"]
+    COSMOS_DB_PRIMARY_KEY = os.environ["COSMOS_DB_PRIMARY_KEY"]
+    COSMOS_DB_DATABASE_NAME = os.environ["COSMOS_DB_DATABASE_NAME"]
+    COSMOS_DB_CONTAINER_NAME = os.environ["COSMOS_DB_CONTAINER_NAME"]
 
-# Azure Cosmos DB vars
-COSMOS_DB_ENDPOINT = os.environ["COSMOS_DB_ENDPOINT"]
-COSMOS_DB_PRIMARY_KEY = os.environ["COSMOS_DB_PRIMARY_KEY"]
-COSMOS_DB_DATABASE_NAME = os.environ["COSMOS_DB_DATABASE_NAME"]
-COSMOS_DB_CONTAINER_NAME = os.environ["COSMOS_DB_CONTAINER_NAME"]
-
-# Initialize Azure Cosmos DB client
-client = CosmosDBClient(
-    COSMOS_DB_ENDPOINT,
-    COSMOS_DB_PRIMARY_KEY,
-    COSMOS_DB_DATABASE_NAME,
-    COSMOS_DB_CONTAINER_NAME,
-)
+    # Initialize Azure Cosmos DB client
+    client = CosmosDBClient(
+        COSMOS_DB_ENDPOINT,
+        COSMOS_DB_PRIMARY_KEY,
+        COSMOS_DB_DATABASE_NAME,
+        COSMOS_DB_CONTAINER_NAME,
+    ) 
+    return client
 
 def get_cosmos_items():
+    # Inits client
+    client = get_client()
     # Selects all entries that are only on "step 2" and no errors are present, or they are on step 2 with the RateLimitError from Groq
     query = "SELECT * FROM c WHERE NOT IS_DEFINED(c.error) AND c.step = 2 OR c.step = 2 AND CONTAINS(c.error.failure_reason, 'RateLimitError')"
 
@@ -30,6 +33,10 @@ def get_cosmos_items():
     return items
 
 def text_to_model_func(items):
+    
+    # Inits client
+    client = get_client()
+    
     text_to_model = TextToModel(JobPostingModel)
 
 
@@ -42,7 +49,7 @@ def text_to_model_func(items):
         
         #Error handling for prompt_llama3_to_json
         if isinstance(response, str):
-            print(f"Error in parsing text to json, entry id = {item['id']} - {str(response)}")
+            logging.warning(f"Error in parsing text to json, entry id = {item['id']} - {str(response)}")
             error_obj = {
                 "step" : 3,
                 "timestamp" : datetime.now().isoformat(),
@@ -69,7 +76,7 @@ def text_to_model_func(items):
             try:
                 del item["error"]
             except KeyError as e:
-                print("No error to be deleted")
+                logging.info("No error to be deleted")
             
 
         
@@ -99,7 +106,7 @@ def text_to_model_func(items):
         
         resp = client.update_item(llm_populated_data["id"], llm_populated_data)
         if resp == None:
-            print(f"failed to update item : {llm_populated_data['id']}")
+            logging.info(f"failed to update item : {llm_populated_data['id']}")
             
         if "error" in llm_populated_data:
             error_count += 1
@@ -107,7 +114,7 @@ def text_to_model_func(items):
             success_count += 1
             
         if len(items) >= 10 and i % (len(items) // 10) == 0:
-            print(f"Completed {(i / len(items) * 100)+ 10:.0f}% - with {error_count} errors, and {success_count} successes")
-            print(datetime.now() - starttime)   
+            logging.info(f"Completed {(i / len(items) * 100)+ 10:.0f}% - with {error_count} errors, and {success_count} successes")
+            logging.info(datetime.now() - starttime)   
             
-    print(f"Updated {success_count} items sucessfully in the DB - {error_count} failed - out of a total of {len(items)}")
+    logging.info(f"Updated {success_count} items sucessfully in the DB - {error_count} failed - out of a total of {len(items)}")
