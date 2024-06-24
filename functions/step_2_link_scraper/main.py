@@ -4,7 +4,7 @@ from common import CosmosDBClient
 from tenacity import retry, stop_after_attempt, wait_fixed
 import requests
 from bs4 import BeautifulSoup
-from quality_control import html_text_quality_control
+from .quality_control import html_text_quality_control
 
 #Using the requests package to extract entire HTML page from a link, wrapped in retry logic if a 400 status happens
 @retry(stop=stop_after_attempt(3), wait=wait_fixed(5), reraise=True)

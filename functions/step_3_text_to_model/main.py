@@ -1,27 +1,30 @@
 from datetime import datetime
 from common import TextToModel, CosmosDBClient
 import os
-from json_model import JobPostingModel
-from quality_control import check_quality
+from .json_model import JobPostingModel
+from .quality_control import check_quality
 
 
 
+def get_client() -> CosmosDBClient:
+    # Azure Cosmos DB vars
+    COSMOS_DB_ENDPOINT = os.environ["COSMOS_DB_ENDPOINT"]
+    COSMOS_DB_PRIMARY_KEY = os.environ["COSMOS_DB_PRIMARY_KEY"]
+    COSMOS_DB_DATABASE_NAME = os.environ["COSMOS_DB_DATABASE_NAME"]
+    COSMOS_DB_CONTAINER_NAME = os.environ["COSMOS_DB_CONTAINER_NAME"]
 
-# Azure Cosmos DB vars
-COSMOS_DB_ENDPOINT = os.environ["COSMOS_DB_ENDPOINT"]
-COSMOS_DB_PRIMARY_KEY = os.environ["COSMOS_DB_PRIMARY_KEY"]
-COSMOS_DB_DATABASE_NAME = os.environ["COSMOS_DB_DATABASE_NAME"]
-COSMOS_DB_CONTAINER_NAME = os.environ["COSMOS_DB_CONTAINER_NAME"]
-
-# Initialize Azure Cosmos DB client
-client = CosmosDBClient(
-    COSMOS_DB_ENDPOINT,
-    COSMOS_DB_PRIMARY_KEY,
-    COSMOS_DB_DATABASE_NAME,
-    COSMOS_DB_CONTAINER_NAME,
-)
+    # Initialize Azure Cosmos DB client
+    client = CosmosDBClient(
+        COSMOS_DB_ENDPOINT,
+        COSMOS_DB_PRIMARY_KEY,
+        COSMOS_DB_DATABASE_NAME,
+        COSMOS_DB_CONTAINER_NAME,
+    ) 
+    return client
 
 def get_cosmos_items():
+    # Inits client
+    client = get_client()
     # Selects all entries that are only on "step 2" and no errors are present, or they are on step 2 with the RateLimitError from Groq
     query = "SELECT * FROM c WHERE NOT IS_DEFINED(c.error) AND c.step = 2 OR c.step = 2 AND CONTAINS(c.error.failure_reason, 'RateLimitError')"
 
@@ -30,6 +33,10 @@ def get_cosmos_items():
     return items
 
 def text_to_model_func(items):
+    
+    # Inits client
+    client = get_client()
+    
     text_to_model = TextToModel(JobPostingModel)
 
 
