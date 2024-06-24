@@ -18,7 +18,7 @@ step_3_trigger_name = os.environ.get("ServiceBusStep3Trigger")
 # # # # # Step 1
 # # Jobindex paginator (Timer trigger)
 @app.function_name("JobindexPaginatorTimerTrigger")
-@app.timer_trigger(schedule="0 0 * * * *", arg_name="myTimer", run_on_startup=True)
+@app.timer_trigger(schedule="0 0 * * * *", arg_name="myTimer", run_on_startup=False)
 def jobindex_paginator_timer_trigger(myTimer: func.TimerRequest) -> None:
     try:
         jobindex_paginator()
