@@ -1,6 +1,6 @@
 from datetime import datetime
 from common import TextToModel, CosmosDBClient
-import os
+import os, logging
 from .json_model import JobPostingModel
 from .quality_control import check_quality
 
@@ -49,7 +49,7 @@ def text_to_model_func(items):
         
         #Error handling for prompt_llama3_to_json
         if isinstance(response, str):
-            print(f"Error in parsing text to json, entry id = {item['id']} - {str(response)}")
+            logging.warning(f"Error in parsing text to json, entry id = {item['id']} - {str(response)}")
             error_obj = {
                 "step" : 3,
                 "timestamp" : datetime.now().isoformat(),
@@ -76,7 +76,7 @@ def text_to_model_func(items):
             try:
                 del item["error"]
             except KeyError as e:
-                print("No error to be deleted")
+                logging.info("No error to be deleted")
             
 
         
@@ -106,7 +106,7 @@ def text_to_model_func(items):
         
         resp = client.update_item(llm_populated_data["id"], llm_populated_data)
         if resp == None:
-            print(f"failed to update item : {llm_populated_data['id']}")
+            logging.info(f"failed to update item : {llm_populated_data['id']}")
             
         if "error" in llm_populated_data:
             error_count += 1
@@ -114,7 +114,7 @@ def text_to_model_func(items):
             success_count += 1
             
         if len(items) >= 10 and i % (len(items) // 10) == 0:
-            print(f"Completed {(i / len(items) * 100)+ 10:.0f}% - with {error_count} errors, and {success_count} successes")
-            print(datetime.now() - starttime)   
+            logging.info(f"Completed {(i / len(items) * 100)+ 10:.0f}% - with {error_count} errors, and {success_count} successes")
+            logging.info(datetime.now() - starttime)   
             
-    print(f"Updated {success_count} items sucessfully in the DB - {error_count} failed - out of a total of {len(items)}")
+    logging.info(f"Updated {success_count} items sucessfully in the DB - {error_count} failed - out of a total of {len(items)}")

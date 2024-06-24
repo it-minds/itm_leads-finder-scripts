@@ -1,4 +1,5 @@
 import os
+import logging
 from datetime import datetime
 from common import CosmosDBClient
 from tenacity import retry, stop_after_attempt, wait_fixed
@@ -19,13 +20,13 @@ def get_html_text_content(link):
     try:
         html_document = get_html_document(link["link"])
     except Exception as e:
-        print(f"failed to get html doc - {e} - for entry with id: {link['id']}")
+        logging.info(f"failed to get html doc - {e} - for entry with id: {link['id']}")
         return None
     try:
         # Create soup object
         soup = BeautifulSoup(html_document, 'html.parser') 
     except Exception as e:
-        print("failed to get soup object",e)
+        logging.info("failed to get soup object",e)
         return None
     
     return soup.get_text("-", True).replace("\n", "")
@@ -80,14 +81,14 @@ def link_scraper():
 
         resp = client.update_item(link["id"], link)
         if resp == None: 
-            print(f"failed to update item - id: {link['id']}")
+            logging.info(f"failed to update item - id: {link['id']}")
             
         if "error" in link:
             error_count += 1
         else:
             success_count += 1
 
-    print(f"Updated {success_count} items sucessfully in the DB - {error_count} failed - out of a total of {len(links)}")
+    logging.info(f"Updated {success_count} items sucessfully in the DB - {error_count} failed - out of a total of {len(links)}")
 
 
 
