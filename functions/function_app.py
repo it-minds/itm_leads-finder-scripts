@@ -71,13 +71,13 @@ def text_to_model_servicebus_queue_trigger(msg: func.ServiceBusMessage):
         items = get_cosmos_items()
         if items:
             logging.warning(f"{len(items)} entries found - proccessing 10")
-            text_to_model_func(items[:10])
+            text_to_model_func(items)
             # Send a message to the Service Bus
-            with ServiceBusClient.from_connection_string(connection_str) as client:
-                sender = client.get_queue_sender(queue_name=step_3_trigger_name)
-                with sender:
-                    message = ServiceBusMessage("Text to model completed")
-                    sender.send_messages(message)
+            # with ServiceBusClient.from_connection_string(connection_str) as client:
+            #     sender = client.get_queue_sender(queue_name=step_3_trigger_name)
+            #     with sender:
+            #         message = ServiceBusMessage("Text to model completed")
+            #         sender.send_messages(message)
                     
     except Exception as e:
         logging.warning(f"text_to_model failed: str {e}") 
