@@ -68,9 +68,9 @@ def linkedin_paginator():
         # Retry the current page if no links are found
         if not links:
             attempts += 1
-            logging.info(f"No links found, retrying after delay... Attempt count: {attempts}, at start={START}")
+            logging.warning(f"No links found, retrying after delay... Attempt count: {attempts}, at start={START}")
             if attempts >= 2:
-                logging.info("Maximum retries reached, stopping.")
+                logging.warning("Maximum retries reached, stopping.")
                 break
             time.sleep(2)
             continue
@@ -82,7 +82,7 @@ def linkedin_paginator():
         all_links.extend(links)
         
         # Increment start for showing more posts
-        logging.info(f"At start {START}")
+        logging.warning(f"At start {START}")
         START += 10
         
 
@@ -102,5 +102,5 @@ def linkedin_paginator():
             error_count += 1
         
 
-    logging.info(f"Saved {len(all_links) - error_count} links to Azure Cosmos DB, with {error_count} errors happening out of a total of {len(all_links)} - See cosmosDB Insights for more info")
+    logging.warning(f"Saved {len(all_links) - error_count} links to Azure Cosmos DB, with {error_count} errors happening out of a total of {len(all_links)} - See cosmosDB Insights for more info")
 

@@ -20,13 +20,13 @@ def get_html_text_content(link):
     try:
         html_document = get_html_document(link["link"])
     except Exception as e:
-        logging.info(f"failed to get html doc - {e} - for entry with id: {link['id']}")
+        logging.warning(f"failed to get html doc - {e} - for entry with id: {link['id']}")
         return None
     try:
         # Create soup object
         soup = BeautifulSoup(html_document, 'html.parser') 
     except Exception as e:
-        logging.info("failed to get soup object",e)
+        logging.warning("failed to get soup object",e)
         return None
     
     return soup.get_text("-", True).replace("\n", "")
@@ -74,21 +74,21 @@ def link_scraper():
             link["error"] = error_obj
 
         
-        # Update link object with new information
+        # Update link object with new warningrmation
         link["text"] = "" if html_text_content is None else html_text_content
         link["step"] = 2
         link["step_2_timestamp"] = datetime.now().isoformat()
 
         resp = client.update_item(link["id"], link)
         if resp == None: 
-            logging.info(f"failed to update item - id: {link['id']}")
+            logging.warning(f"failed to update item - id: {link['id']}")
             
         if "error" in link:
             error_count += 1
         else:
             success_count += 1
 
-    logging.info(f"Updated {success_count} items sucessfully in the DB - {error_count} failed - out of a total of {len(links)}")
+    logging.warning(f"Updated {success_count} items sucessfully in the DB - {error_count} failed - out of a total of {len(links)}")
 
 
 

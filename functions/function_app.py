@@ -18,7 +18,7 @@ step_3_trigger_name = os.environ.get("ServiceBusStep3Trigger")
 # # # # # Step 1
 # # Jobindex paginator (Timer trigger)
 @app.function_name("JobindexPaginatorTimerTrigger")
-@app.timer_trigger(schedule="0 0 * * * *", arg_name="myTimer", run_on_startup=False)
+@app.timer_trigger(schedule="0 0 * * *", arg_name="myTimer", run_on_startup=False)
 def jobindex_paginator_timer_trigger(myTimer: func.TimerRequest) -> None:
     try:
         jobindex_paginator()
@@ -70,7 +70,7 @@ def text_to_model_servicebus_queue_trigger(msg: func.ServiceBusMessage):
     try:
         items = get_cosmos_items()
         if items:
-            logging.info(f"{len(items)} entries found - proccessing 10")
+            logging.warning(f"{len(items)} entries found - proccessing 10")
             text_to_model_func(items[:10])
             # Send a message to the Service Bus
             with ServiceBusClient.from_connection_string(connection_str) as client:
