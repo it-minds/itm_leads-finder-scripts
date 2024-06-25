@@ -26,7 +26,12 @@ def get_cosmos_items():
     # Inits client
     client = get_client()
     # Selects all entries that are only on "step 2" and no errors are present, or they are on step 2 with the RateLimitError from Groq
-    query = "SELECT * FROM c WHERE NOT IS_DEFINED(c.error) AND c.step = 2 OR c.step = 2 AND CONTAINS(c.error.failure_reason, 'RateLimitError')"
+    query = """
+        SELECT * FROM c 
+        WHERE (NOT IS_DEFINED(c.error) AND c.step = 2) 
+        OR 
+        (c.step = 2 AND CONTAINS(c.error.failure_reason, 'RateLimitError'))
+    """
 
     # Fetching all items from db which have completed step 2
     items = client.fetch_items_by_query(query)
@@ -76,7 +81,7 @@ def text_to_model_func(items):
             try:
                 del item["error"]
             except KeyError as e:
-                logging.info("No error to be deleted")
+                logging.warning("No error to be deleted")
             
 
         
@@ -106,7 +111,7 @@ def text_to_model_func(items):
         
         resp = client.update_item(llm_populated_data["id"], llm_populated_data)
         if resp == None:
-            logging.info(f"failed to update item : {llm_populated_data['id']}")
+            logging.warning(f"failed to update item : {llm_populated_data['id']}")
             
         if "error" in llm_populated_data:
             error_count += 1
@@ -114,7 +119,7 @@ def text_to_model_func(items):
             success_count += 1
             
         if len(items) >= 10 and i % (len(items) // 10) == 0:
-            logging.info(f"Completed {(i / len(items) * 100)+ 10:.0f}% - with {error_count} errors, and {success_count} successes")
-            logging.info(datetime.now() - starttime)   
+            logging.warning(f"Completed {(i / len(items) * 100)+ 10:.0f}% - with {error_count} errors, and {success_count} successes")
+            logging.warning(datetime.now() - starttime)   
             
-    logging.info(f"Updated {success_count} items sucessfully in the DB - {error_count} failed - out of a total of {len(items)}")
+    logging.warning(f"Updated {success_count} items sucessfully in the DB - {error_count} failed - out of a total of {len(items)}")

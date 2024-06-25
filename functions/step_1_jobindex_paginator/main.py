@@ -34,9 +34,9 @@ def jobindex_paginator():
     error_count = 0
 
     while page_number < last_page:
-        logging.info(f"Processing page {page_number}...")
+        logging.warning(f"Processing page {page_number}...")
         url = BASE_URL + str(page_number)
-        logging.info(url)
+        logging.warning(url)
         response = requests.get(url)
         soup = BeautifulSoup(response.text, "html.parser")
 
@@ -55,9 +55,9 @@ def jobindex_paginator():
         # Retry the current page if no links are found
         if not links:
             attempts += 1
-            logging.info(f"No links found, retrying after delay... Attempt count: {attempts}")
+            logging.warning(f"No links found, retrying after delay... Attempt count: {attempts}")
             if attempts >= MAX_ATTEMPTS:
-                logging.info("Maximum retries reached, stopping.")
+                logging.warning("Maximum retries reached, stopping.")
                 break
             time.sleep(RETRY_DELAY_SECONDS)
             continue
@@ -85,4 +85,4 @@ def jobindex_paginator():
         if isinstance(cosmos_response, exceptions.CosmosHttpResponseError):
             error_count += 1
 
-    logging.info(f"Saved {len(all_links) - error_count} links to Azure Cosmos DB, with {error_count} errors happening out of a total of {len(all_links)} - See cosmosDB Insights for more info")
+    logging.warning(f"Saved {len(all_links) - error_count} links to Azure Cosmos DB, with {error_count} errors happening out of a total of {len(all_links)} - See cosmosDB Insights for more info")

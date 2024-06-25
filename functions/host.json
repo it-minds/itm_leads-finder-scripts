@@ -1,10 +1,21 @@
 {
   "version": "2.0",
   "logging": {
+    "logLevel": {
+      "default": "Error",
+      "Host.Results": "Error",
+      "Function": "Warning",
+      "Host.Aggregator": "Error",
+      "Function.leads-finder": "Error",
+      "Function.leads-finder.User" : "Error"
+    },
     "applicationInsights": {
       "samplingSettings": {
         "isEnabled": true,
         "excludedTypes": "Request"
+      },
+      "httpAutoCollectionOptions": {
+        "enableHttpTriggerExtendedInfoCollection": false
       }
     }
   },
