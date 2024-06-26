@@ -14,7 +14,7 @@ isodate==0.6.1
 langchain-core==0.2.10
 pycparser==2.22
 pydantic==2.7.2
-requests==2.31.0
+requests==2.32.2
 six==1.16.0
 soupsieve==2.5
 tenacity==8.3.0
