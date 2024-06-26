@@ -11,7 +11,7 @@ common @ git+https://github.com/it-minds/itm_leads-finder-scripts.git@main#subdi
 cryptography==42.0.8
 idna==3.7
 isodate==0.6.1
-langchain-core==0.2.3
+langchain-core==0.2.10
 pycparser==2.22
 pydantic==2.7.2
 requests==2.31.0
