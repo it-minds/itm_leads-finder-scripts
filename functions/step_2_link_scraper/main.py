@@ -7,6 +7,40 @@ import requests
 from bs4 import BeautifulSoup
 from .quality_control import html_text_quality_control
 
+
+import re
+from typing import Union
+from seleniumbase import SB
+# require pip install -U seleniumbase
+def extract_text_from_url(url) -> Union[str, None]:
+    """
+    Attempts to extract and clean text from the specified URL.
+
+    Parameters:
+        url (str): The URL of the webpage to extract text from.
+
+    Returns:
+        Union[str, None]: The cleaned text if extraction is successful, None otherwise.
+    """
+    try:
+        with SB(headless2=True, uc=True) as driver:
+            driver.get(url)
+            driver.wait_for_ready_state_complete()
+            driver.scroll_to_bottom()
+            driver.wait_for_ready_state_complete()
+            soup = driver.get_beautiful_soup()
+            all_text = soup.get_text()
+
+        # Replace multiple line breaks with a single line break
+        cleaned_text = re.sub(r"\n+", "\n", all_text)
+
+        return cleaned_text
+    except Exception as e:
+        logging.warning(f"Failed to extract text from {url}. Error: {e}")
+        return None
+
+
+
 #Using the requests package to extract entire HTML page from a link, wrapped in retry logic if a 400 status happens
 @retry(stop=stop_after_attempt(3), wait=wait_fixed(5), reraise=True)
 def get_html_document(url):

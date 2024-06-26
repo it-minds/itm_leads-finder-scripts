@@ -1,5 +1,6 @@
 # hoaj specific ignores: 
 internal/main.py
+**/.DS_Store
 
 # AndreasHolmAndersen specific ignores:
 internal/common/test
