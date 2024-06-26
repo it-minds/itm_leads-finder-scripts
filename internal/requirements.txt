@@ -25,7 +25,6 @@ langsmith==0.1.65
 multidict==6.0.5
 numpy==1.26.4
 orjson==3.10.3
-packaging==23.2
 pydantic==2.7.2
 pydantic_core==2.18.3
 python-dotenv==1.0.1
