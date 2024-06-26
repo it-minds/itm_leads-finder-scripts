@@ -20,3 +20,4 @@ soupsieve==2.5
 tenacity==8.3.0
 typing_extensions==4.12.1
 urllib3==2.2.1
+seleniumbase==4.28.0

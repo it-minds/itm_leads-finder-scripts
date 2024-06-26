@@ -24,7 +24,7 @@ def extract_text_from_url(url) -> Union[str, None]:
     """
     try:
         with SB(headless2=True, uc=True) as driver:
-            driver.get(url)
+            driver.uc_open_with_reconnect(url, 3)
             driver.wait_for_ready_state_complete()
             driver.scroll_to_bottom()
             driver.wait_for_ready_state_complete()
