@@ -5,7 +5,7 @@ from common import CosmosDBClient
 from tenacity import retry, stop_after_attempt, wait_fixed
 import requests
 from bs4 import BeautifulSoup
-from .quality_control import html_text_quality_control
+from quality_control import html_text_quality_control
 
 
 import re
@@ -86,7 +86,7 @@ def link_scraper():
     success_count = 0
     
     # Selects all entries that are only on "step 1"
-    query = "SELECT * FROM c WHERE c.step = 1" 
+    query = "SELECT * FROM c WHERE c.step = 2" 
 
     # Fetches all entries in db which are ready for step 2 (Marked as step = 1 in DB)
     links = client.fetch_items_by_query(query)
@@ -95,7 +95,7 @@ def link_scraper():
     # Loops through each link and retrieves the text content of the html pages, finally updates the entry in DB with text content and updated step
     for link in links:
 
-        html_text_content = get_html_text_content(link)
+        html_text_content = extract_text_from_url(link["link"])
         
         failure_reason = html_text_quality_control(html_text_content)
         
@@ -124,7 +124,7 @@ def link_scraper():
 
     logging.warning(f"Updated {success_count} items sucessfully in the DB - {error_count} failed - out of a total of {len(links)}")
 
-
+link_scraper()
 
 
 
