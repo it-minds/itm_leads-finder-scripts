@@ -7,7 +7,7 @@ from step_2_link_scraper.main import link_scraper
 from step_1_jobindex_paginator.main import jobindex_paginator
 from step_1_linkedin_paginator.main import linkedin_paginator
 
-app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
+app = func.FunctionApp()
 
 # Step 1 - Jobindex paginator (Timer trigger)
 @app.function_name("JobindexPaginatorTimerTrigger")

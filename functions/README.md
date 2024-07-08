@@ -17,17 +17,22 @@ The `function_app.py` file defines several Azure Functions, each responsible for
     - Triggered daily at midnight.
     - Paginates through Jobindex listings and sends a message to the Service Bus.
 
-2. **Linkedin Paginator (Service Bus Queue Trigger)**:
-    - Triggered by a message from the Service Bus.
+2. **Linkedin Paginator (Timer Trigger)**:
+    - Triggered daily 6 minutes past midnight
     - Paginates through LinkedIn listings and sends a message to the next Service Bus queue.
 
-3. **Link Scraper (Service Bus Queue Trigger)**:
-    - Triggered by a message from the Service Bus.
+3. **Link Scraper (Timer Trigger)**:
+    - Triggered daily 12 minutes past midnight
     - Scrapes links and sends a message to the next Service Bus queue.
 
-4. **Text to Model (Service Bus Queue Trigger)**:
-    - Triggered by a message from the Service Bus.
+4. **Text to Model (Timer Trigger)**:
+    - Triggered daily 18 minutes past midnight
     - Processes items from Cosmos DB and transforms text data to a model format.
+
+5. **Text to Model (Http Trigger)**:
+    - Triggered by a HttpTrigger so it is callable whenever
+    - Processes items from Cosmos DB and transforms text data to a model format.
+    - If you wanna call this use the URL for the function `https://leads-finder.azurewebsites.net/api/texttomodel` with the query param `code` and set the value to the function key from the function app.
 
 ## Environment Variables
 
