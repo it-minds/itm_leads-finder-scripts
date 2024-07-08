@@ -11,8 +11,8 @@
     },
     "applicationInsights": {
       "samplingSettings": {
-        "isEnabled": true,
-        "excludedTypes": "Request"
+        "isEnabled": false,
+        "excludedTypes": ""
       },
       "httpAutoCollectionOptions": {
         "enableHttpTriggerExtendedInfoCollection": false
