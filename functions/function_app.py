@@ -7,7 +7,7 @@ from step_2_link_scraper.main import link_scraper
 from step_1_jobindex_paginator.main import jobindex_paginator
 from step_1_linkedin_paginator.main import linkedin_paginator
 
-app = func.FunctionApp()
+app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
 # Step 1 - Jobindex paginator (Timer trigger)
 @app.function_name("JobindexPaginatorTimerTrigger")
@@ -43,8 +43,24 @@ def text_to_model_timer_trigger(myTimer: func.TimerRequest) -> None:
     try:
         items = get_cosmos_items()
         if items:
-            logging.warning(f"{len(items)} entries found - processing 10")
+            logging.warning(f"{len(items)} entries found")
             text_to_model_func(items)
     except Exception as e:
         logging.warning(f"Text to model failed: {e}")
+        
+# Step 5 - Text to Model (HTTP trigger) - Callable Text to Model
+@app.function_name("TextToModelHttpTrigger")
+@app.route(route="textToModel", methods=["POST"])
+def text_to_model_http_trigger(req: func.HttpRequest) -> func.HttpResponse:
+    try:
+        items = get_cosmos_items()
+        if items:
+            logging.warning(f"{len(items)} entries found")
+            text_to_model_func(items)
+            return func.HttpResponse(f"Processed {len(items)} items.", status_code=200)
+        else:
+            return func.HttpResponse("No items found.", status_code=200)
+    except Exception as e:
+        logging.warning(f"Text to model failed: {e}")
+        return func.HttpResponse(f"Text to model failed: {e}", status_code=500)
 
