@@ -32,7 +32,7 @@ The `function_app.py` file defines several Azure Functions, each responsible for
 5. **Text to Model (Http Trigger)**:
     - Triggered by a HttpTrigger so it is callable whenever
     - Processes items from Cosmos DB and transforms text data to a model format.
-    - If you wanna call this use the URL for the function `https://leads-finder.azurewebsites.net/api/texttomodel` with the query param `code` and set the value to the function key from the function app.
+    - If you wanna call this use the URL for the function `https://leads-finder.azurewebsites.net/api/texttomodel` with the query param `code` and set the value to the function key from the function app. (Find this under `Function App => App Keys => Default`)
 
 ## Environment Variables
 
