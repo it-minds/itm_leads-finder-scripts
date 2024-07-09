@@ -110,6 +110,7 @@ def text_to_model_func(items):
         llm_populated_data = {**item, **llm_populated_data}
         
         resp = client.update_item(llm_populated_data["id"], llm_populated_data)
+        logging.warning(f"Created item with id: {llm_populated_data['id']}")
         if resp == None:
             logging.warning(f"failed to update item : {llm_populated_data['id']}")
             
