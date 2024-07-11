@@ -1,89 +1,88 @@
 import azure.functions as func
-from azure.servicebus import ServiceBusClient, ServiceBusMessage
+import azure.durable_functions as df
 import logging
-import os
-import requests
 from step_3_text_to_model.main import text_to_model_func, get_cosmos_items
 from step_2_link_scraper.main import link_scraper
 from step_1_jobindex_paginator.main import jobindex_paginator
 from step_1_linkedin_paginator.main import linkedin_paginator
 
-azure_function_app_default_key = os.environ.get("AzureFunctionAppDefaultKey")
+app = df.DFApp()
 
-app = func.FunctionApp()
+# A time-triggered function with a Durable Functions client binding
+@app.durable_client_input(client_name="client")
+@app.timer_trigger(schedule="0 0 * * *", arg_name="myTimer", run_on_startup=True)
+async def leads_finder_timer_trigger(myTimer: func.TimerRequest, client: df.DurableOrchestrationClient):
+    logging.warning("timer trigger started")
+    await client.start_new("leads_finder_orchestrator")
+    
+    
 
-# Step 1 - Jobindex paginator (Timer trigger)
-@app.function_name("JobindexPaginatorTimerTrigger")
-@app.timer_trigger(schedule="0 0 * * *", arg_name="myTimer", run_on_startup=False)
-def jobindex_paginator_timer_trigger(myTimer: func.TimerRequest) -> None:
+# Orchestrator
+@app.orchestration_trigger(context_name="context")
+def leads_finder_orchestrator(context: df.DurableOrchestrationContext):
+    logging.warning("orchestrator started")
+    jobindex_result = yield context.call_activity("jobindex_paginator_activity")
+    linkedin_result = yield context.call_activity("linkedin_paginator_activity")
+    
+    
+    
+    if not (jobindex_result and linkedin_result):
+        logging.warning("jobindex/linkedin failed")
+        return None
+    
+    link_scraper_result = yield context.call_activity("link_scraper_activity")
+    
+    if not link_scraper_result:
+        logging.warning("link scraper failed")
+        return None
+    
+    try:
+        yield context.call_activity("text_to_model_activity")
+    except Exception as e:
+        logging.error(e)
+    
+        
+
+
+# # Activities
+# Jobindex paginator
+@app.activity_trigger(input_name="input")
+def jobindex_paginator_activity(input: str):
+    logging.warning("jobindex paginator started")
     try:
         jobindex_paginator()
     except Exception as e:
         logging.warning(f"Jobindex paginator failed: {e}")
+        return False
+    return True
 
-# Step 2 - Linkedin paginator (Timer trigger)
-@app.function_name("LinkedinPaginatorTimerTrigger")
-@app.timer_trigger(schedule="06 0 * * *", arg_name="myTimer", run_on_startup=False)
-def linkedin_paginator_timer_trigger(myTimer: func.TimerRequest) -> None:
+# Linkedin paginator
+@app.activity_trigger(input_name="input")
+def linkedin_paginator_activity(input: str):
     try:
         linkedin_paginator()
     except Exception as e:
         logging.warning(f"Linkedin paginator failed: {e}")
+        return False
+    return True
 
-# # Step 3 - Link Scraper (Timer trigger)
-@app.function_name("LinkScraperTimerTrigger")
-@app.timer_trigger(schedule="12 0 * * *", arg_name="myTimer", run_on_startup=False)
-def link_scraper_timer_trigger(myTimer: func.TimerRequest) -> None:
+# Link scraper
+@app.activity_trigger(input_name="input")
+def link_scraper_activity(input: str):
     try:
         link_scraper()
     except Exception as e:
         logging.warning(f"Link scraper failed: {e}")
-    
-    url = f"https://leads-finder.azurewebsites.net/api/textToModelStarter?code={azure_function_app_default_key}"
-    requests.post(url, json={})
+        return False
+    return True
 
-# # Step 4 - Text to Model (Timer trigger)
-# @app.function_name("TextToModelTimerTrigger")
-# @app.timer_trigger(schedule="18 0 * * *", arg_name="myTimer", run_on_startup=False)
-# def text_to_model_timer_trigger(myTimer: func.TimerRequest) -> None:
-#     try:
-#         items = get_cosmos_items()
-#         if items:
-#             logging.warning(f"{len(items)} entries found")
-#             text_to_model_func(items)
-#     except Exception as e:
-#         logging.warning(f"Text to model failed: {e}")
-        
-# Step 5 - Text to Model (HTTP trigger) - Callable Text to Model
-@app.function_name("TextToModelHttpTrigger")
-@app.route(route="textToModel", methods=["POST"])
-def text_to_model_http_trigger(req: func.HttpRequest) -> func.HttpResponse:
+# Text to model
+@app.activity_trigger(input_name="input")
+def text_to_model_activity(input: str):
     try:
         items = get_cosmos_items()
         if len(items) > 0:
-            items_to_parse = items[:8] if len(items) > 8 else items
             logging.warning(f"{len(items)} entries found")
-            text_to_model_func(items_to_parse)
-            logging.warning(f"Processed {len(items_to_parse)} items.")
-            #Rerun the function
-            logging.warning("Rerunning Text to Model")
-            url = f"https://leads-finder.azurewebsites.net/api/textToModelStarter?code={azure_function_app_default_key}"
-            # url = "http://localhost:7071/api/test"
-            requests.post(url, json={})
-            return func.HttpResponse(f"{len(items) - 8} entries remaining")
-            
-        else:
-            return func.HttpResponse("No items found.", status_code=200)
+            text_to_model_func(items)         
     except Exception as e:
-        logging.warning(f"Text to model failed: {e}")
-        return func.HttpResponse(f"Text to model failed: {e}", status_code=500)
-    
-
-@app.function_name("TextToModelStarter")
-@app.route(route="textToModelStarter", methods=["POST"])
-def text_to_model_http_trigger(req: func.HttpRequest) -> func.HttpResponse:
-    #url = "http://localhost:7071/api/textToModel"
-    url = f"https://leads-finder.azurewebsites.net/api/textToModel?code={azure_function_app_default_key}"
-    requests.post(url, json={})
-    return func.HttpResponse("OK", status_code=200)
-        
+        logging.warning(e)
