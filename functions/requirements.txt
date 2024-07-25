@@ -8,6 +8,7 @@ cffi==1.16.0
 charset-normalizer==3.3.2
 common @ git+https://github.com/it-minds/itm_leads-finder-scripts.git@main#subdirectory=internal
 cryptography==42.0.8
+fuzzywuzzy==0.18.0
 idna==3.7
 isodate==0.6.1
 langchain-core==0.2.10

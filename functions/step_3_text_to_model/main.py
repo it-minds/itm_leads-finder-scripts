@@ -31,6 +31,10 @@ def get_cosmos_items():
         WHERE (NOT IS_DEFINED(c.error) AND c.step = 2) 
         OR 
         (c.step = 2 AND CONTAINS(c.error.failure_reason, 'RateLimitError'))
+        OR
+        (c.step = 2 AND CONTAINS(c.error.failure_reason, 'OutputParserException'))
+        OR
+        (c.step = 2 AND CONTAINS(c.error.failure_reason, 'TypeError'))
     """
 
     # Fetching all items from db which have completed step 2
@@ -104,6 +108,7 @@ def text_to_model_func(items):
             "industry": response.industry,
             "application_deadline": response.application_deadline,
             "posting_time": response.posting_time,
+            "groups": response.groups
         }
         
         # Merge llm_populated_data with item

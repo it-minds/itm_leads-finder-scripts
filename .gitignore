@@ -4,6 +4,7 @@ internal/main.py
 
 # AndreasHolmAndersen specific ignores:
 internal/common/test
+functions/step_4_tech_generalisation
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
