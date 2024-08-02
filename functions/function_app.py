@@ -45,7 +45,6 @@ def leads_finder_orchestrator(context: df.DurableOrchestrationContext):
             logging.warning("link scraper failed")
             return None
         
-
         items = get_cosmos_items()
         logging.warning(f"Items fetched - {len(items)}")
         continuation_token = {'start_index': 0, 'items': items}

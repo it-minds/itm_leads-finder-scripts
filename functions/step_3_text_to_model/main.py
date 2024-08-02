@@ -1,9 +1,11 @@
 from datetime import datetime
 from common import TextToModel, CosmosDBClient
 import os, logging
-from .json_model import JobPostingModel
-from .quality_control import check_quality
+from dotenv import load_dotenv
+from .json_model import JobPostingModel, TechnologyGroupEnum
+from .quality_control import check_quality, clean_job_posting_groups
 
+load_dotenv()
 
 
 def get_client() -> CosmosDBClient:
@@ -87,7 +89,7 @@ def text_to_model_func(items):
             except KeyError as e:
                 logging.warning("No error to be deleted")
             
-
+        clean_job_posting_groups(response)
         
 
         
